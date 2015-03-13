@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+#
+# Kommand
+#
+$:.unshift File.expand_path("../../lib", __FILE__)
+
+require 'kommand/kli'
+
+Kommand::KLI.start(*ARGV)
