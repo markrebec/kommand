@@ -55,19 +55,30 @@ module Kommand
           arguments
         end
 
+        # reset arguments to the provided args
         def set_arguments(*args)
           @arguments = Arguments.new
           add_arguments(*args)
         end
 
+        # add arguments to existing args
         def add_arguments(*args)
           @arguments ||= Arguments.new
           args.each_with_index do |arg,a|
             argk, argv = *parse_arg(arg)
             
+            # if the argument is not a known flag, is not a valid argument and the last argument was
+            # a known flag, this must be a value for the last argument
             if !argument_flag?(arg) && !valid_argument?(argk) && (a > 0 && argument_flag?(args[a-1]))
               @arguments.last.value = arg
               next
+            end
+
+            # swap key/val to create an unnamed arg - if next argument is a valid flag we must be
+            # a standalone argument
+            if a < args.length && (argv.nil? || argv.empty?) && !Commands::exists?(arg) && valid_argument?(args[a+1])
+              argv = argk
+              argk = nil
             end
 
             raise InvalidArgument, "Invalid Argument: #{arg}" if validate_arguments? && !valid_argument?(argk)
@@ -79,7 +90,7 @@ module Kommand
 
         def parse_arg(arg)
           arga = arg.split("=")
-          [arga.slice!(0), arga.join("=")]
+          [arga.slice!(0), arga.join("=")] # rejoin with '=' in case there was an '=' in the passed value
         end
         
         def valid_argument?(key)

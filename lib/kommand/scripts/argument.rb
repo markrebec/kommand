@@ -9,15 +9,38 @@ module Kommand
       end
 
       def key
-        @keys.is_a?(Array) ? @keys[0] : @keys
+        if unnamed?
+          value
+        else
+          @keys.is_a?(Array) ? @keys[0] : @keys
+        end
       end
 
       def keys
-        @keys.is_a?(Array) ? @keys : [@keys]
+        if unnamed?
+          [value]
+        else
+          @keys.is_a?(Array) ? @keys : [@keys]
+        end
       end
 
       def name
         keys.sort { |a,b| a.length <=> b.length }.last.gsub(/^--/, '')
+      end
+
+      # is this an unnamed argument?
+      def unnamed?
+        @keys == nil
+      end
+
+      # is this argument valid?
+      def valid?
+        !((validate? && !@valid.include?(val)) && (!val.nil? && !val.empty?))
+      end
+
+      # should this argument validate?
+      def validate?
+        !@valid.nil?
       end
 
       protected
