@@ -74,9 +74,9 @@ module Kommand
               next
             end
 
-            # swap key/val to create an unnamed arg - if next argument is a valid flag we must be
-            # a standalone argument
-            if (!args[a+1] || valid_argument?(args[a+1])) && (argv.nil? || argv.empty?) && !Commands::exists?(arg)
+            # swap key/val to create an unnamed arg - if we're not a valid arg and we're the last argument or the
+            # next argument is a valid arg we must be an unnamed argument
+            if !valid_argument?(argk) && (!args[a+1] || valid_argument?(parse_arg(args[a+1])[0])) && (argv.nil? || argv.empty?) && !Commands::exists?(arg)
               argv = argk
               argk = nil
             end
